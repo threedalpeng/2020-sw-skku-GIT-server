@@ -5,6 +5,7 @@ import Login from "./views/Login";
 import SignUp from "./views/SignUp"
 import Video from "./views/UI_01";
 import Graph from "./views/UI_02";
+
 Vue.use(VueRouter);
 
 const router = new VueRouter({
