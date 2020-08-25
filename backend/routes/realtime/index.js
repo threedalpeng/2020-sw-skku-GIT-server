@@ -9,7 +9,7 @@ function streamAnalyzedImage(io) {
     io.on('connection', (socket) => {
         socket.on('camstream', (stream) => {
             let processedStream = processStream(stream);
-            io.broadcast.emit('stream_display', processedStream);
+            socket.broadcast.emit('stream_display', processedStream);
         });
     });
 }
