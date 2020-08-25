@@ -33,7 +33,7 @@ export default {
     };
   },
   created(){
-     this.socket.on('msg display', (image) => {
+     this.socket.on('stream_display', (image) => {
       this.frame= `data:image/png;base64, ${image.img}`;
       this.n_person= image.total_people;
       this.n_mask_on= (image.mask_weared* 1) + (image.mask_incorrect* 1);
