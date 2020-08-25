@@ -3,7 +3,7 @@
     <h3>Login Page</h3>
     <img src= "../assets/login_mascot.png">
     <input type= "text" v-model="email" placeholder= "email"><br>
-    <input type= "password" v-model="password" placeholder= "password"><br>
+    <input type= "password" @keyup.enter= "Login" v-model="password" placeholder= "password"><br>
     <button v-on:click="login">Login</button><br>
     <router-link to= "/signup"><button>Sign up</button></router-link>
   </div>
@@ -21,19 +21,28 @@ export default {
   },
   methods: {
     login() {
-      firebase.auth().signInWithEmailAndPassword(this.email, this.password).
-      then(
-        function(user){
-          console.log(user.name)
-          alert('login!')
-          router.push('/UI_01')
-        },
-        function(err) {
-          alert('error! : ' + err.message)
-        }
-      );
-    }
-  }
+      firebase
+        .auth()
+        .setPersistence(firebase.auth.Auth.Persistence.SESSION)
+        .then(() => {
+            console.log("####", this);
+            return firebase
+              .auth()
+              .signInWithEmailAndPassword(this.email, this.password);
+          })
+          .then(() => {
+            const user = firebase.auth().currentUser;
+            console.log(user);
+            alert(`Welcome! ${user.email}`);
+            this.$router.push("/video");
+          })
+          .catch(function(error) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            alert(errorMessage + errorCode);
+          });
+    },
+  },
 };
 </script>
 
