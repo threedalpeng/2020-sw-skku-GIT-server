@@ -11,7 +11,7 @@ app.io = io;
 // let indexRouter = require('./routes/index');
 // let usersRouter = require('./routes/users');
 let realtimeRouter = require('./routes/realtime/index')(app.io);
-let statRouter = require('./routes/statistics/index')
+let statsRouter = require('./routes/stats/index')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 app.use('/api/realtime', realtimeRouter);
-app.use('/api/stat', statRouter);
+app.use('/api/stats', statsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
