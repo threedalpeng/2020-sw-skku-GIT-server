@@ -7,8 +7,8 @@ const {
 
 function streamAnalyzedImage(io) {
     io.on('connection', (socket) => {
-        socket.on('camstream', (stream) => {
-            let processedStream = processStream(stream);
+        socket.on('camstream', async (stream) => {
+            let processedStream = await processStream(stream);
             socket.broadcast.emit('stream_display', processedStream);
         });
     });
