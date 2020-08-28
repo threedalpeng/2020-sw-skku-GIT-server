@@ -34,7 +34,6 @@
     data() {
       return {
         result: '',
-        picker: new Date().toISOString().substr(0, 10),
         date: '',
       }
     },
@@ -44,12 +43,13 @@
     methods: {
       formatDate(date) {
             if (!date) return null
-            const [year, month, day] = date.split('-')
-            return `${year}/${month}/${day}`
+            ;[this.year, this.month, this.date] = date.split('-')
+            this.month
+            return `${this.year}/${+this.month}/${+this.day}`
       },
       getData() {
         this.date = this.formatDate(this.picker)
-        axios.get('https://115.145.212.100:53344/api/stats')
+        axios.get('http://115.145.212.100:53344/api/stats/'+ this.date)
           .then(res => {
             this.result = res.data
             console.log(res.data)
