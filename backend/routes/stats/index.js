@@ -5,7 +5,6 @@ const {
     getStatsByDate
 } = require('./stats');
 
-//today mem for graph
 router.get('/', function (req, res, next) {
     let now = new Date();
     let year = now.getFullYear();
@@ -15,7 +14,6 @@ router.get('/', function (req, res, next) {
     getStatsByDate(res, today);
 });
 
-//past mem
 router.get('/:year/:month/:date', function (req, res, next) {
     let year = req.params.year;
     let month = req.params.month;
