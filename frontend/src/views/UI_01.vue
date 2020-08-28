@@ -6,9 +6,15 @@
         <!-- 위 코드 추후에(1계정에 카메라 추가 && 사용자 추가) 수정바란다 미래의 나야 -->
         <v-icon large color="white" dark right>mdi-video</v-icon>
       </v-btn>
+        <v-btn 
+        v-on:click="link_to_graph"
+        id="b2" color="primary" dark>Analysis 
+        <v-icon color="white" dark right>mdi-graph</v-icon>
+      </v-btn>
     </div>
       <div class= "video">
         <br>
+        <img v-show="!Isimg" src= "../assets/UI_01/default_img.png" align="left">
         <img :src= "frame" align="left">
         <hr>
       </div>
@@ -28,6 +34,7 @@ export default {
   },
   data (){
     return {
+      Isimg: '',
       frame: '',
       n_person: '',
       n_mask_off: '',
@@ -49,7 +56,18 @@ export default {
       this.risk= Math.round(image.risk);
       this.congestion= Math.round(image.congestion);//},50);
     });
-  }
+  },
+  methods: {
+    link_to_graph(){
+      this.$router.push("/graph");
+    }
+  },
+  watch:{
+    frame: function(val){
+      if(val != '')
+        this.Isimg= true;
+    }
+  },
 }
 </script>
 
@@ -62,6 +80,10 @@ export default {
   color: blue;
 }
 #b1{
+  outline: 5px;
+  margin-left: 17px;
+}
+#b2{
   outline: 5px;
   margin-left: 17px;
 }
