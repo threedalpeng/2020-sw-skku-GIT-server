@@ -1,50 +1,48 @@
 <template>
-  <div class ="Figures">
-        <div class = "title_n_person">
-            <h2>인원 수</h2>
-        </div><hr>
-        <div class= "n_person">
-          <h2>
-            <!-- <img src="../assets/img_n_person.png">  -->
-            {{ figures.n_person }} 
-            </h2> 
-        </div><br>
+<div class= "Figures">
+    <div class= "person_container">
+        <img src="../assets/UI_01/img_n_person.png">
+        <div class= "value">인원 수: {{ figures.n_person }}</div>
+    </div>
 
-        <div class = "title_n_mask_off">
-            <h2>마스크 OFF</h2>
-        </div><br>
-        <div :style="{ color: OffColor}" class = "n_mask_off">
-            <img src="../assets/img_n_mask_off.png">
-            <h2> :{{ figures.n_mask_off }}</h2> 
-        </div><br>
+    <br><div class= "contatiner_hr"><hr></div><br>
 
-        <div class = "title_n_mask_on">
-            <h2>마스크 ON</h2>
-        </div><br>
-        <div :style="{ color: OnColor}" class = "n_mask_on">
-            <h2><img src="../assets/img_n_mask_on.png">:{{ figures.n_mask_on }}</h2> 
-        </div><br>
+    <div class= "mask_container_title">
+    <div :style="{ color: OffColor }" class= "n_mask_off">마스크OFF</div>
+    <div :style="{ color: OnColor }" class= "n_mask_on">마스크ON</div>
+    <div :style="{ color: UnknownColor }" class= "n_mask_unknown"> 마스크??</div>
+    </div>
 
-        <div class = "title_n_mask_unknown">
-            <h2>마스크 UNKNOWN</h2>
-        </div><br>
-        <div :style="{ color: UnknownColor}" class= "n_mask_unknown">
-            <h2><img src="../assets/img_n_mask_unknown.png">:{{ figures.n_mask_unknown }}</h2> 
-        </div><br>
-
-        <div class = "title_risk">
-            <!-- <h2>감염 위험</h2> -->
-        </div>
-        <div :style="{ color: RiskColor}" class= "risk">
-            <h2>감염 위험={{ figures.risk }}</h2> 
-        </div><br>
-        <div class = "title_risk">
-            <!-- <h2>혼잡도</h2> -->
-        </div>
-        <div :style="{ color: CongestionColor}" class= "congestion">
-            <h2>혼잡도={{ figures.congestion }}</h2> 
-        </div>
+  <div class= "mask_container_img">
+    <img class= "figure_img" src="../assets/UI_01/img_n_mask_off.png">
+    <img class= "figure_img" src="../assets/UI_01/img_n_mask_on.png">
+    <img class= "figure_img" src="../assets/UI_01/img_n_mask_unknown.png">
   </div>
+
+  <div class= "mask_container_val">
+    <div :style="{ color: OffColor }" class= "n_mask_off">
+        {{ figures.n_mask_off }}
+    </div>
+    <div :style="{ color: OnColor }" class= "n_mask_on">
+        {{ figures.n_mask_on }}
+    </div>
+    <div :style="{ color: UnknownColor }" class= "n_mask_unknown">
+        {{ figures.n_mask_unknown }}
+    </div>
+  </div>
+    
+  <br><div class= "contatiner_hr"><hr></div><br>
+    
+  <div class= "literal_container_title">
+    <div :style="{ color: RiskColor}" class= "risk">위험도</div>
+    <div :style="{ color: CongestionColor}" class= "congestion">혼잡도</div>
+  </div>
+
+   <div class= "literal_container_val">
+    <div :style="{ color: RiskColor}" class= "risk">{{ figures.risk }}</div>
+    <div :style="{ color: CongestionColor}" class= "congestion">{{ figures.congestion }}</div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -94,16 +92,55 @@
 </script>
 
 <style scoped>
-.title_n_person{
-  margin-left : 300px;
+.person_container{
+  font-weight:bold;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.Figures{
-  float: left;
-  margin-left : 30px;
+.mask_container_img{
+  display: flex;
+  flex-flow: row wrap;    
+  justify-content: space-around;
+  align-items: center;
+  margin-right: 3px;
+}
+.mask_container_title{
+  display: flex;
+  font-weight: bold;
+  font-size: 20px;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+.mask_container_val{
+  font-size: 25px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+.literal_container_title{
+  font-size: 25px;
+  display: flex;
+  font-weight: bold;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  align-items: center;
+}
+.literal_container_val{
+  font-size: 35px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  align-items: center;
 }
 hr{
-  float: right;
+  height: 2px;
+  width: 50%;
+  text-align: right;
+  margin-right: 0;
   border-color: black;
-  border-style: dotted;
 }
 </style>
