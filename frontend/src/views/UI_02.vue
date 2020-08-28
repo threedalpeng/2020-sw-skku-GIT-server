@@ -34,8 +34,11 @@
     data() {
       return {
         result: '',
-        picker: new Date().toISOString().substr(0, 10),
-        date: '',
+        today: new Date(),
+        year: this.today.getFullYear(),
+        month: this.today.getMonth(),
+        date: this.today.getDate(),
+        picker: this.year + '-' + this.month + '-' + this.date,
       }
     },
     created() {
@@ -44,12 +47,14 @@
     methods: {
       formatDate(date) {
             if (!date) return null
-            const [year, month, day] = date.split('-')
-            return `${year}/${month}/${day}`
+            ;[this.year, this.month, this.date] = date.split('-')
+            if(this.month < 10) this.month = this.month % 10
+            if(this.date < 10) this.date = this.date % 10
+            return `${this.year}/${this.month}/${this.day}`
       },
       getData() {
         this.date = this.formatDate(this.picker)
-        axios.get('https://115.145.212.100:53344/api/stats'+ this.date)
+        axios.get('https://115.145.212.100:53344/api/stats/'+ this.date)
           .then(res => {
             this.result = res.data
             console.log(res.data)
