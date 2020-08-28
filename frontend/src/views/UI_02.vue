@@ -49,7 +49,7 @@
       },
       getData() {
         this.date = this.formatDate(this.picker)
-        axios.get('https://115.145.212.100:53344/api/stats'+ this.date)
+        axios.get('https://115.145.212.100:53344/api/stats')
           .then(res => {
             this.result = res.data
             console.log(res.data)
