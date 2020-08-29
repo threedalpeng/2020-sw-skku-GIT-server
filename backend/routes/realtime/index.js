@@ -2,8 +2,13 @@ const express = require('express')
 const router = express.Router();
 
 const {
-    processStream
-} = require('./realtime')
+    processStream,
+    switchPythonProcess
+} = require('./realtime');
+
+router.get('/video', function (res, req, next) {
+    switchPythonProcess();
+});
 
 function streamAnalyzedImage(io) {
     io.on('connection', (socket) => {
