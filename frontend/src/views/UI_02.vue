@@ -4,7 +4,7 @@
     <v-container fluid>
       <v-row>
         <v-col cols="12" sm="2" class="my-2 px-1">
-          <v-date-picker v-model="picker" @click='getData()' ></v-date-picker>
+          <v-date-picker v-model="picker"></v-date-picker>
         </v-col>
         <v-col cols="12" sm="4" class="my-2 px-1">
           <h3>Congestion Chart</h3>
@@ -34,17 +34,21 @@
     data() {
       return {
         result: '',
-        picker: '',
+        picker: new Date().toISOString().substr(0, 10),
       }
     },
     created() {
       this.getData() //anytime the vue instance is created, call the fetchData() function.
     },
+    watch: {
+      picker (val) {
+        getData()
+      }
+    },
     methods: {
       formatDate(date) {
             if (!date) return date
             ;[this.year, this.month, this.date] = date.split('-')
-            this.month
             return `${this.year}/${+this.month}/${+this.day}`
       },
       getData() {
@@ -52,7 +56,7 @@
         axios.get('http://115.145.212.100:53344/api/stats/'+ this.date)
           .then(res => {
             this.result = res.data
-            console.log(res.data)
+            console.log(this.result)
           })
       },
     }
