@@ -1,11 +1,7 @@
 const mysql = require('mysql2');
+const config = require('../../config/config.json')
 
-let connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'dbuser',
-    password: '1029',
-    database: 'statistics'
-});
+let connection = mysql.createConnection(config.database);
 
 function getDayDataByDate(dateNow) {
     return new Promise((resolve, reject) => {
