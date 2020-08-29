@@ -5,7 +5,7 @@
   export default {
     extends: Bar,
     mixins: [mixins.reactiveProp],
-    props: ['items'],
+    props: 'items',
     data () {
       return {
         datacollection: {
@@ -28,7 +28,6 @@
               borderWidth: 1,
               pointBorderColor: '#249EBF',
               //Data to be represented on y-axis
-              
             }
           ]
         },

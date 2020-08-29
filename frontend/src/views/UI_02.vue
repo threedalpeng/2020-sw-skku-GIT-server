@@ -42,7 +42,7 @@
     },
     watch: {
       picker (val) {
-        getData()
+        this.getData()
       }
     },
     methods: {
