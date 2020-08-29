@@ -34,7 +34,7 @@
     data() {
       return {
         result: '',
-        date: '',
+        picker: '',
       }
     },
     created() {
@@ -42,7 +42,7 @@
     },
     methods: {
       formatDate(date) {
-            if (!date) return null
+            if (!date) return date
             ;[this.year, this.month, this.date] = date.split('-')
             this.month
             return `${this.year}/${+this.month}/${+this.day}`
