@@ -3,11 +3,18 @@ const router = express.Router();
 
 const {
     processStream,
-    switchPythonProcess
+    switchPythonProcess,
+    killPythonProcess
 } = require('./realtime');
 
-router.get('/video', function (res, req, next) {
-    switchPythonProcess();
+router.get('/switch', async function (req, res, next) {
+    let process_type = await switchPythonProcess();
+    res.end(process_type);
+});
+
+router.get('/kill', function (req, res, next) {
+    killPythonProcess();
+    res.end("Kill");
 });
 
 function streamAnalyzedImage(io) {
