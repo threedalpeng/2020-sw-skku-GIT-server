@@ -74,6 +74,20 @@ function convertHourData(hours) {
     });
 }
 
+function convertDateData(date) {
+    return new Promise((resolve, reject) => {
+        let result = {};
+        if (date.n_people == 0)
+            result.rate_mask_off = -1;
+        else
+            result.rate_mask_off = date.no_mask / date.n_people;
+        result.risk = date.risk;
+        result.congestion = date.congestion;
+        result.high_risk_time = date.high_risk_time;
+        resolve(result);
+    });
+}
+
 async function getStatsByDate(res, dateNow) {
     let hour_data = await getHourDataByDate(dateNow);
     let day_data = await getDayDataByDate(dateNow);
@@ -83,7 +97,7 @@ async function getStatsByDate(res, dateNow) {
         date_stats: {}
     };
     result.hour_stats = await convertHourData(hour_data);
-    result.date_stats = day_data[0];
+    result.date_stats = await convertDateData(day_data[0]);
     res.send(result);
 }
 
