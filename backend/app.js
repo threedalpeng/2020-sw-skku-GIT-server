@@ -2,16 +2,28 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const logger = require('morgan');
+const models = require('./models/index');
 
 let app = express();
-let io = require('socket.io')();
+let {
+  io
+} = require('./scripts/socket');
 app.io = io;
 
-// let indexRouter = require('./routes/index');
-// let usersRouter = require('./routes/users');
-let realtimeRouter = require('./routes/realtime/index')(app.io);
-let statsRouter = require('./routes/stats/index')
+models.sequelize.sync({
+  alter: true
+}).then(() => {
+  console.log("DB connected");
+}).catch(err => {
+  console.log("DB failed");
+  console.log(err);
+});
+
+let realtimeRouter = require('./routes/realtime/index');
+let statsRouter = require('./routes/stats/index');
+let settingsRouter = require('./routes/settings/index');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,6 +34,9 @@ app.use(express.json());
 app.use(express.urlencoded({
   extended: false
 }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -29,6 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/users', usersRouter);
 app.use('/api/realtime', realtimeRouter);
 app.use('/api/stats', statsRouter);
+app.use('/api/settings', settingsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -5,21 +5,6 @@ const {
     getStatsByDate
 } = require('./stats');
 
-router.get('/', function (req, res, next) {
-    let now = new Date();
-    let year = now.getFullYear();
-    let month = now.getMonth() + 1;
-    let date = now.getDate();
-    let today = year + '/' + month + '/' + date;
-    getStatsByDate(res, today);
-});
-
-router.get('/:year/:month/:date', function (req, res, next) {
-    let year = req.params.year;
-    let month = req.params.month;
-    let date = req.params.date;
-    let today = year + '/' + month + '/' + date;
-    getStatsByDate(res, today);
-});
+router.get('/:start_date/:end_date/:unit', getStatsByDate);
 
 module.exports = router;

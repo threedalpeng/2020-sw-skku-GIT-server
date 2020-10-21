@@ -1,32 +1,44 @@
 const express = require('express')
 const router = express.Router();
-
+const {
+    io
+} = require('../../scripts/socket');
 const {
     processStream,
-    switchPythonProcess,
-    killPythonProcess
+    initCameras,
+    killAllProcesses,
+    checkVideoProcessesById,
+    runProcess
 } = require('./realtime');
 
-router.get('/switch', async function (req, res, next) {
-    let process_type = await switchPythonProcess();
-    res.end(process_type);
-});
+router.get('/init', initCameras);
+router.get('/kill', killAllProcesses);
 
-router.get('/kill', function (req, res, next) {
-    killPythonProcess();
-    res.end("Kill");
-});
-
-function streamAnalyzedImage(io) {
-    io.on('connection', (socket) => {
-        socket.on('camstream', async (stream) => {
-            let processedStream = await processStream(stream);
-            socket.broadcast.emit('stream_display', processedStream);
-        });
+io.on('connection', (socket) => {
+    socket.on('camstream', async (stream) => {
+        let processedStream = await processStream(stream);
+        socket.to("cam " + stream.camera_id).emit('stream_display', processedStream);
     });
-}
 
-module.exports = (io) => {
-    streamAnalyzedImage(io);
-    return router;
-}
+    socket.on('join_room', (id) => {
+        socket.join("cam " + id);
+    });
+
+    socket.on('leave_room', (id) => {
+        socket.leave("cam " + id);
+    });
+
+    socket.on('switch_room', (cur_id, next_id) => {
+        socket.leave("cam " + cur_id);
+        socket.join("cam " + next_id);
+        console.log(next_id);
+        runProcess(next_id);
+        // checkVideoProcessesById(next_id);
+    });
+
+    socket.on('disconnect', () => {
+        socket.removeAllListeners();
+    });
+});
+
+module.exports = router;
