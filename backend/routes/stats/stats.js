@@ -7,12 +7,12 @@ const {
 
 function getListsPerMinute(cam_id, start_date, end_date) {
     const days_period = moment(end_date).diff(moment(start_date), 'days') + 1;
-    return new Promise(async (resolve, reject)=> {
+    return new Promise(async (resolve, reject) => {
         prd_lists = {
             risks: [],
             congestions: []
         }
-    
+
         let prd_data = await models.minutely_data.findAll({
             raw: true,
             attributes: ['analyzed_time', 'risk', 'congestion'],
@@ -27,14 +27,14 @@ function getListsPerMinute(cam_id, start_date, end_date) {
                 ['analyzed_time', 'ASC']
             ]
         });
-    
+
         let cur_prc_time = moment(start_date + " 00:00:00");
         let pi = 0;
         let minutes_period = days_period * 24 * 60;
         let prd_time = '';
         if (prd_data.length != 0)
             prd_time = prd_data[pi].analyzed_time;
-    
+
         for (let j = 0; j < minutes_period; j++) {
             if (prd_time == cur_prc_time.format('YYYY-MM-DD HH:mm:00')) {
                 prd_lists.risks.push(prd_data[pi].risk);
@@ -54,15 +54,17 @@ function getListsPerMinute(cam_id, start_date, end_date) {
 
 function getListsPerHour(cam_id, start_date, end_date) {
     const days_period = moment(end_date).diff(moment(start_date), 'days') + 1;
-    return new Promise(async (resolve, reject)=> {
+    return new Promise(async (resolve, reject) => {
         prd_lists = {
             risks: [],
             congestions: []
         }
-    
+
         let prd_data = await models.hourly_data.findAll({
             raw: true,
-            attributes: ['analyzed_time', ['avg_risk', 'risk'], ['avg_congestion', 'congestion']],
+            attributes: ['analyzed_time', ['avg_risk', 'risk'],
+                ['avg_congestion', 'congestion']
+            ],
             where: {
                 camera_id: cam_id,
                 analyzed_time: {
@@ -74,14 +76,14 @@ function getListsPerHour(cam_id, start_date, end_date) {
                 ['analyzed_time', 'ASC']
             ]
         });
-    
+
         let cur_prc_time = moment(start_date + " 00:00:00");
         let pi = 0;
         let hours_period = days_period * 24;
         let prd_time = '';
         if (prd_data.length != 0)
             prd_time = prd_data[pi].analyzed_time;
-    
+
         for (let j = 0; j < hours_period; j++) {
             if (prd_time == cur_prc_time.format('YYYY-MM-DD HH:00:00')) {
                 prd_lists.risks.push(prd_data[pi].risk);
@@ -101,15 +103,17 @@ function getListsPerHour(cam_id, start_date, end_date) {
 
 function getListsPerDay(cam_id, start_date, end_date) {
     const days_period = moment(end_date).diff(moment(start_date), 'days') + 1;
-    return new Promise(async (resolve, reject)=> {
+    return new Promise(async (resolve, reject) => {
         prd_lists = {
             risks: [],
             congestions: []
         }
-    
+
         let prd_data = await models.daily_data.findAll({
             raw: true,
-            attributes: ['analyzed_time', ['avg_risk', 'risk'], ['avg_congestion', 'congestion']],
+            attributes: ['analyzed_time', ['avg_risk', 'risk'],
+                ['avg_congestion', 'congestion']
+            ],
             where: {
                 camera_id: cam_id,
                 analyzed_time: {
@@ -121,13 +125,13 @@ function getListsPerDay(cam_id, start_date, end_date) {
                 ['analyzed_time', 'ASC']
             ]
         });
-    
+
         let cur_prc_time = moment(start_date + " 00:00:00");
         let pi = 0;
         let prd_time = '';
         if (prd_data.length != 0)
             prd_time = prd_data[pi].analyzed_time;
-    
+
         for (let j = 0; j < days_period; j++) {
             if (prd_time == cur_prc_time.format('YYYY-MM-DD')) {
                 prd_lists.risks.push(prd_data[pi].risk);
@@ -180,9 +184,10 @@ async function getStatsByDate(req, res) {
         let cam_result = {
             id: cam_list[i].id,
             location: cam_list[i].location,
+            current_hour: +(now.format('HH')),
             proper_n_people: cam_list[i].proper_n_people,
             today: {
-                n_people: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                n_people: [],
                 avg_people: 5,
                 max_people: 10,
                 safety_score: 5,
@@ -204,7 +209,7 @@ async function getStatsByDate(req, res) {
          */
         let safety_scores = await models.daily_data.findAll({
             raw: true,
-            attributes: ['analyzed_time', 'safety_score'],
+            attributes: ['analyzed_time', 'safety_score', 'alert_count'],
             where: {
                 camera_id: cam_list[i].id,
                 analyzed_time: {
@@ -217,15 +222,19 @@ async function getStatsByDate(req, res) {
             ]
         });
 
+        let alert_count_last_week = 0;
         let safety_score_last_week = 0;
         let cnt_last_week = 0;
+        let alert_count_this_week = 0;
         let safety_score_this_week = 0;
         let cnt_this_week = 0;
         for (let j = 0; j < safety_scores.length; j++) {
             if (date_last_week_ends >= safety_scores[j].analyzed_time) {
+                alert_count_last_week += safety_scores[j].alert_count;
                 safety_score_last_week += safety_scores[j].safety_score;
                 cnt_last_week++;
             } else {
+                alert_count_this_week += safety_scores[j].alert_count;
                 safety_score_this_week += safety_scores[j].safety_score;
                 cnt_this_week++;
             }
@@ -234,12 +243,58 @@ async function getStatsByDate(req, res) {
             safety_score_this_week /= cnt_this_week;
         if (cnt_last_week != 0)
             safety_score_last_week /= cnt_last_week;
-        cam_result.today.safety_score = Math.round(safety_score_this_week * 10) / 10;
-        cam_result.today.prev_safety_score = Math.round(safety_score_last_week * 10) / 10;
+        if (cam_result.id == 3) {
+            safety_score_this_week *= (9 / 10)
+            safety_score_last_week *= (9 / 10)
+        }
+        cam_result.today.safety_score = Math.round(safety_score_this_week * (1 - alert_count_this_week / (7 * 14 * 12)) * 10) / 10;
+        cam_result.today.prev_safety_score = Math.round(safety_score_last_week * (1 - alert_count_last_week / (7 * 14 * 12)) * 10) / 10;
 
         /*
          * create stats for today
          */
+
+        let today_hour_data = await models.hourly_data.findAll({
+            raw: true,
+            attributes: ['analyzed_time', 'avg_congestion', 'max_congestion'],
+            where: {
+                camera_id: cam_result.id,
+                analyzed_time: {
+                    [Op.gte]: now.format('YYYY-MM-DD 00:00:00'),
+                    [Op.lt]: now.format('YYYY-MM-DD HH:00:00')
+                }
+            }
+        });
+        console.log(today_hour_data);
+
+        let today_cong = [];
+        let today_avg_cong = 0;
+        let today_max_cong = 0;
+        let cur_today_time = moment(now.format('YYYY-MM-DD 00:00:00'));
+        let hi = 0;
+        let today_time = '';
+        if (today_hour_data.length != 0)
+            today_time = today_hour_data[hi].analyzed_time;
+
+        for (let j = 0; j < 24; j++) {
+            if (today_time == cur_today_time.format('YYYY-MM-DD HH:00:00')) {
+                today_cong.push(today_hour_data[hi].avg_congestion);
+                today_avg_cong += today_hour_data[hi].avg_congestion
+                if (today_max_cong < today_hour_data[hi].max_congestion)
+                    today_max_cong = today_hour_data[hi].max_congestion
+                if (++hi < today_hour_data.length)
+                    today_time = today_hour_data[hi].analyzed_time;
+            } else {
+                today_cong.push(0);
+            }
+            cur_today_time.add(1, 'hours');
+        }
+        if (today_hour_data.length != 0)
+            today_avg_cong /= today_hour_data.length;
+
+        cam_result.today.n_people = today_cong;
+        cam_result.today.avg_people = today_avg_cong;
+        cam_result.today.max_people = today_max_cong;
 
 
         /*
@@ -297,6 +352,23 @@ async function getStatsByDate(req, res) {
 
         result.push(cam_result);
     }
+
+    /*
+     * hard coding for sample data (never use except testing)
+     */
+
+    result[0].proper_n_people = 20;
+    result[1].proper_n_people = 30;
+    result[2].proper_n_people = 9;
+    for (let i = 0; i < 3; i++) {
+        let perc = (result[i].proper_n_people / 60);
+        for (let j = 0; j < 24; j++) {
+            result[i].today.n_people[j] = Math.round(result[i].today.n_people[j] * perc);
+        }
+        result[i].today.avg_people = Math.round(result[i].today.avg_people * perc);
+        result[i].today.max_people = Math.round(result[i].today.max_people * perc);
+    }
+
     res.send(result);
 }
 

@@ -9,7 +9,9 @@
 </template>
 
 <script>
-import firebase from 'firebase'
+// import firebase from 'firebase'
+// import * as firebase from 'firebase/app';
+import 'firebase/auth';
 import router from 'router'
 export default {
     name: 'signup',
@@ -21,7 +23,7 @@ export default {
     },
     methods: {
         signUp() {
-            console.log('반갑다');
+            console.log('Login!');
             firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
             .then(
                 function(user) {
@@ -49,7 +51,6 @@ export default {
         padding: 15px;
     }
     button {
-        
         margin-top: 20px;
         width: 10%;
         cursor: pointer;

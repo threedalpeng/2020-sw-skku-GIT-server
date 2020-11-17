@@ -11,18 +11,6 @@ const {
 
 
 class Camera {
-    camera_id = 0;
-    room = '';
-    io = null;
-    _n_people = 0;
-    _risk = 0;
-    _congestion = 0;
-    _cnt_stream = 0;
-    _camera_info;
-    _process = null;
-    _schd_realtime;
-    _schd_check_alert;
-
     constructor(camera_id, io) {
         this.camera_id = camera_id;
         console.log(this.camera_id + " Created");
@@ -34,11 +22,15 @@ class Camera {
         */
         this._schd_realtime = schedule.scheduleJob('0 * * * * *', this.uploadRealtimeData.bind(this));
         this._schd_check_alert = schedule.scheduleJob('0 */5 * * * *', this.checkAlert.bind(this));
-        this.n_people = 0;
-        this.risk = 0;
-        this.congestion = 0;
-        this.cnt_stream = 0;
+        this._n_people = 0;
+        this._risk = 0;
+        this._congestion = 0;
+        this._cnt_stream = 0;
         this.room = 'cam ' + this.camera_id;
+        this._camera_info;
+        this._process = null;
+        this._schd_realtime;
+        this._schd_check_alert;
         this.io = io;
     }
 
@@ -61,18 +53,15 @@ class Camera {
 
             let now = moment().subtract(1, 'minutes');
 
-            /*
-            await models.time_data.create({
+            await models.minutely_data.create({
                 camera_id: this.camera_id,
-                captured_date: now.format("YYYY-MM-DD"),
-                captured_time: now.format("HH:mm:00"),
+                analyzed_date: now.format("YYYY-MM-DD HH:mm:00"),
                 n_people: n_people,
                 risk: risk,
                 congestion: congestion
             }, {
                 logging: false
             });
-            */
         }
     }
 
@@ -108,7 +97,6 @@ class Camera {
             }
 
             let alert_result = 0;
-            console.log(`check Alert... ${alert_crit.alarm_criteria}`);
 
             if (total_risk >= alert_crit.alarm_criteria) {
                 alert_result = 1;
@@ -121,8 +109,7 @@ class Camera {
                 await models.time_data.findOrCreate({
                     where: {
                         camera_id: this.camera_id,
-                        captured_date: beg_time.format("YYYY-MM-DD"),
-                        captured_time: beg_time.format("HH:mm:00")
+                        analyzed_date: beg_time.format("YYYY-MM-DD HH:mm:00")
                     },
                     defaults: {
                         camera_id: this.camera_id,
@@ -145,7 +132,7 @@ class Camera {
                 */
 
                 // DO ALERT!!
-                alertRisk(alert_result);
+                // this.alertRisk(alert_result);
             }
         }
     }

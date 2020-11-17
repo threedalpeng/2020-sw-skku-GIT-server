@@ -8,11 +8,13 @@ const Camera = require('../../class/Camera');
 const {
     io
 } = require('../../scripts/socket');
+const HashMap = require('hashmap');
 
-let camera_map = new Map();
+let camera_map = new HashMap();
 
 function processStream(stream) {
     return new Promise((resolve, reject) => {
+        // stream.total_people = 3;
         stream.total_people = stream.mask_weared + stream.mask_off + stream.mask_incorrect + stream.mask_unknown;
         if (stream.risk > 100)
             stream.risk = 100

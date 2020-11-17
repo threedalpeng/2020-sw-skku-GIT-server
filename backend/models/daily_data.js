@@ -31,7 +31,12 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.FLOAT
             },
             alert_count: {
-                type: DataTypes.INTEGER
+                type: DataTypes.INTEGER,
+                defualtValue: 0
+            },
+            data_count : {
+                type: DataTypes.INTEGER,
+                defaultValue: 0
             }
         }, {
             comment: "Data per hour"

@@ -1,84 +1,99 @@
 <script>
-  //Importing Bar class from the vue-chartjs wrapper
-  import { Bar, mixins } from 'vue-chartjs'
-  //Exporting this so it can be used in other components
+  //Importing Bar and mixins class from the vue-chartjs wrapper
+  import {Line, mixins} from 'vue-chartjs'
+  //Getting the reactiveProp mixin from the mixins module.
+  const { reactiveProp } = mixins
   export default {
-    extends: Bar,
-    mixins: [mixins.reactiveProp],
-    props: 'items',
+    extends: Line,
+    mixins: [reactiveProp],
     data () {
       return {
-        datacollection: {
-          //Data to be represented on x-axis
-          labels: [
-            '0~2 Hour', '2~4 Hour','4~6 Hour', '6~8 Hour', '8~10 Hour', '10~12 Hour', '12~14 Hour', '14~16 Hour', '16~18 Hour', '18~20 Hour', '20~22 Hour', '22~24 Hour', ],
-          datasets: [
-            {
-              label: 'Congestion',
-              data: [
-                this.items.hour_stats[0].congestion, this.items.hour_stats[1].congestion,
-                this.items.hour_stats[2].congestion, this.items.hour_stats[3].congestion,
-                this.items.hour_stats[4].congestion, this.items.hour_stats[5].congestion,
-                this.items.hour_stats[6].congestion, this.items.hour_stats[7].congestion,
-                this.items.hour_stats[8].congestion, this.items.hour_stats[9].congestion,
-                this.items.hour_stats[10].congestion, this.items.hour_stats[11].congestion
-              ],
-              // backgroundColor: '#f87979',
-              pointBackgroundColor: 'white',
-              borderWidth: 1,
-              pointBorderColor: '#249EBF',
-              //Data to be represented on y-axis
-            }
-          ]
-        },
-        //Chart.js options that controls the appearance of the chart
+        //Chart.js options that control the appearance of the chart
         options: {
           scales: {
             yAxes: [{
               ticks: {
-                beginAtZero: true
+                max : 100,
+                beginAtZero: true,
+                stepSize: 50,
+                callback: function(value, index, values) {
+                        return value + '%';
+                }
               },
               gridLines: {
                 display: true
               }
             }],
             xAxes: [ {
+              ticks: {
+                stepSize: 15
+              },
               gridLines: {
-                display: false
+                display: true
               }
             }]
           },
           legend: {
             display: true
+            // display: false if you want the color of top to be hidden
           },
-          responsive: true, // 그래프 넓이
-          maintainAspectRatio: false
+          tooltips: {
+            enabled: true,
+            mode: 'single',
+            callbacks: {
+                label: function(tooltipItems, data) { 
+                    return '혼잡도: ' +tooltipItems.yLabel + ' %';
+                }
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          elements: {
+            point:{
+                radius: 0
+            },
+            line: {
+                tension: 0
+            }
+          },
+          drawHorizontalLine: {
+            lineY: [60, 60],
+            //lineColor: "rgba(50, 155, 255, 0.85)",
+            lineColor: "rgba(255, 0, 0, 0.4)",
+            text: '60%',
+            textPosition: 10,
+            textFont: '18px sans-serif',
+            textColor: "rgba(255, 0, 0, 0.4)"
+          }
+                /*
+          horizontalLine: [{
+            "y": 60,
+            "style": "rgba(255, 0, 0, .4)",
+            "text": "60%"
+          }],*/
+          /*
+          annotation: {
+            annotations: [
+              {
+                type: "line",
+                mode: "horizontal",
+                scaleID: "y-axis-0",
+                borderColor: "rgba(255, 0, 0, .4)",
+                value: "60",
+                label: {
+                  content: "",
+                  enabled: true,
+                  position: "top"
+                }
+              }
+            ]
+          }*/
         }
       }
     },
     mounted () {
-      //renderChart function renders the chart with the datacollection and options object.
-      this.renderChart(this.datacollection, this.options)
-    },
-    methods: {
-      colorMagic(){
-        var congestion_01= 50;
-        var congestion_02= 100;
-        var congestion_03= 150;
-        var congestion_04= 200;
-        var dataset= this.datacollection.datasets[0];
-        for(var i= 0; i < dataset.data.length; i++) {
-          if (dataset.data[i] <= congestion_01)       dataset.backgroundColor[i]= chartColors.blue;
-          else if (dataset.data[i] <= congestion_02)  dataset.backgroundColor[i]= chartColors.green;
-          else if (dataset.data[i] <= congestion_03)  dataset.backgroundColor[i]= chartColors.yellow;
-          else if (dataset.data[i] <= congestion_04)  dataset.backgroundColor[i]= chartColors.orange;
-          else 
-            dataset.backgroundColor[i]= chartColors.red;
-        }
-      }
-    },
-    created(){
-      this.colorMagic();
+      // this.chartData is created in the mixin and contains all the data needed to build the chart.
+      this.renderChart(this.chartData, this.options)
     }
   }
 </script>

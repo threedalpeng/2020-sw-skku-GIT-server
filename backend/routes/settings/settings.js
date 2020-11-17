@@ -10,6 +10,10 @@ async function getCameraSettings(req, res) {
             id: req.params.id
         }
     });
+    
+    if (current_settings.camera_id == 2 || current_settings.camera_id == 3) {
+        current_settings.access_path = (current_settings.access_path).replace("/home/seungho/darknet/2020-sw-skku-GIT/video/", "");
+    }
     res.send(current_settings);
 }
 
@@ -26,7 +30,9 @@ async function saveCameraSettings(req, res) {
             new_settings.alarm_criteria = 80;
             break;
     }
-    console.log(new_settings);
+    if (new_settings.camera_id == 2 || new_settings.camera_id == 3) {
+        new_settings.access_path = '/home/seungho/darknet/2020-sw-skku-GIT/video/' + new_settings.access_path;
+    }
     models.camera.update({
         room_size: new_settings.room_size,
         distance_criteria: new_settings.distance_criteria,

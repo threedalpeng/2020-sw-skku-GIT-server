@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
             alert_count: {
                 type: DataTypes.INTEGER,
                 defaultValue: 0
+            },
+            data_count : {
+                type: DataTypes.INTEGER,
+                defaultValue: 0
             }
         }, {
             comment: "Hourly Data"

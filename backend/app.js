@@ -40,8 +40,6 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
 app.use('/api/realtime', realtimeRouter);
 app.use('/api/stats', statsRouter);
 app.use('/api/settings', settingsRouter);

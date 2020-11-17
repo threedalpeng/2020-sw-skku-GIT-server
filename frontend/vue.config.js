@@ -1,4 +1,14 @@
+
+const CompressionPlugin = require('compression-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+    .BundleAnalyzerPlugin;
 module.exports = {
+    configureWebpack: {
+        plugins : [new BundleAnalyzerPlugin({
+            analyzerPort: 1991,
+        })]
+
+    },
     devServer: {
         proxy: {
             '/api': {
@@ -8,8 +18,15 @@ module.exports = {
                     "^/api": ""
                 }
             }
-        }
+        },
     },
     lintOnSave: false,
-    outputDir: "../backend/public"
-};
+    outputDir: "../backend/public",
+    chainWebpack(config) {
+        config.plugins.delete('prefetch');
+        
+        // and this line 
+        config.plugin('CompressionPlugin').use(CompressionPlugin);
+      }
+
+};  

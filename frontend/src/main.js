@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from "./router";
-import firebase from 'firebase'
 import vuetify from './plugins/vuetify';
-
+import * as firebase from 'firebase/app';
+// import 'firebase/auth';
 Vue.config.productionTip = false
 
 var firebaseConfig = {
