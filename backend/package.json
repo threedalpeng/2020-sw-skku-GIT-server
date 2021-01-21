@@ -20,6 +20,6 @@
     "python-shell": "^2.0.1",
     "sequelize": "^6.3.5",
     "shelljs": "^0.8.4",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.0"
   }
 }
