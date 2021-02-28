@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mdi/js": "^5.6.55",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "chart.js": "^2.9.3",
     "chartjs-plugin-annotation": "^0.5.7",
     "chartjs-plugin-zoom": "^0.7.7",
