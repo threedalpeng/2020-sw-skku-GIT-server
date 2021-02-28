@@ -65,29 +65,6 @@
             textFont: '18px sans-serif',
             textColor: "rgba(255, 0, 0, 0.4)"
           }
-                /*
-          horizontalLine: [{
-            "y": 60,
-            "style": "rgba(255, 0, 0, .4)",
-            "text": "60%"
-          }],*/
-          /*
-          annotation: {
-            annotations: [
-              {
-                type: "line",
-                mode: "horizontal",
-                scaleID: "y-axis-0",
-                borderColor: "rgba(255, 0, 0, .4)",
-                value: "60",
-                label: {
-                  content: "",
-                  enabled: true,
-                  position: "top"
-                }
-              }
-            ]
-          }*/
         }
       }
     },

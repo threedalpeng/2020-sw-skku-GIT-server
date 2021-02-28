@@ -1,14 +1,14 @@
 <script>
-  //Importing Bar and mixins class from the vue-chartjs wrapper
+  // Importing Bar and mixins class from the vue-chartjs wrapper
   import {Line, mixins} from 'vue-chartjs'
-  //Getting the reactiveProp mixin from the mixins module.
+  // Getting the reactiveProp mixin from the mixins module.
   const { reactiveProp } = mixins
   export default {
     extends: Line,
     mixins: [reactiveProp],
     data () {
       return {
-        //Chart.js options that control the appearance of the chart
+        // Chart.js options that control the appearance of the chart
         options: {
           scales: {
             yAxes: [{
@@ -66,29 +66,6 @@
             textFont: '18px sans-serif',
             textColor: "rgba(255, 0, 0, 0.4)"
           }
-                /*
-          horizontalLine: [{
-            "y": 60,
-            "style": "rgba(255, 0, 0, .4)",
-            "text": "60%"
-          }],*/
-          /*
-          annotation: {
-            annotations: [
-              {
-                type: "line",
-                mode: "horizontal",
-                scaleID: "y-axis-0",
-                borderColor: "rgba(255, 0, 0, .4)",
-                value: "60",
-                label: {
-                  content: "",
-                  enabled: true,
-                  position: "top"
-                }
-              }
-            ]
-          }*/
         }
       }
     },

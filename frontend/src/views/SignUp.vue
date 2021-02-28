@@ -1,39 +1,54 @@
 <template>
+<!-- this file manages signup page -->
     <div class= "signup">
-        <p>make an account</p>
+        <p>Make an account</p>
         <input type= "text" v-model="email" placeholder="email"><br>
         <input type= "password" v-model="password" placeholder= "password"><br>
+        <input type= "text" v-model="nickname" placeholder="nickname"><br>
         <button v-on:click="signUp">Sign Up!</button>
         <router-link to= "/"><button> Go back to Login</button></router-link>
     </div>
 </template>
 
 <script>
-// import firebase from 'firebase'
 // import * as firebase from 'firebase/app';
-import 'firebase/auth';
+// import 'firebase/auth';
+import axios from 'axios';
 import router from 'router'
+
 export default {
     name: 'signup',
     data() {
         return {
             email: '',
-            password: ''
+            password: '',
+            nickname: ''
         }
     },
     methods: {
+        // signUp() {
+        //     console.log('Login!');
+        //     firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
+        //     .then(
+        //         function(user) {
+        //             alert('your account created!' + user.message)
+        //             this.$router.replace('/')
+        //         },
+        //         function(err) {
+        //             alert('에러 :' + err.message)
+        //         }
+        //      );
+        // }
         signUp() {
-            console.log('Login!');
-            firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
-            .then(
-                function(user) {
-                    alert('your account created!' + user.message)
-                    this.$router.replace('/')
-                },
-                function(err) {
-                    alert('에러 :' + err.message)
-                }
-             );
+            axios.post('api/auth/register', {
+                email: this.email,
+                password: this.password,
+                nickname: this.nickname
+            }).then((res)=>{
+                this.$router.push("/");
+            }).catch(function(err) {
+                alert(`유저 등록에 실패하였습니다.`)
+            });
         }
     }
 }

@@ -1,132 +1,150 @@
 const models = require('../../models');
 const moment = require('moment');
 const {
-    Op
+  Op
 } = require('sequelize');
 
 function ttoh(time) {
-    return new Promise((resolve) => {
-        let time_list = time.split(":", 1);
-        resolve(time_list[0] + ':00');
-    })
+  return new Promise((resolve) => {
+    resolve(time.substr(0, 13) + ":00:00");
+  });
 }
 
-async function createHourlyDataFromTimeData() {
-    //var fs = require('fs');
-    let time_to_find = moment().subtract(1, 'h');
-    let cap_date = time_to_find.format("YYYY-MM-DD HH:mm:00");
-    const minutely_data = await models.minutely_data.findAll({
-        raw: true,
-        attributes: ['camera_id', 'analyzed_time', 'n_people', 'risk', 'congestion', 'alert_checked'],
-        order: [
-            ['camera_id', 'ASC'],
-            ['captured_time', 'ASC']
-        ],
-        where: {
-            analyzed_time: cap_date
-        }
-    });
-    let cam_id = minutely_data[0].camera_id,
-        hour,
-        avg_people = 0,
-        max_people = 0,
-        count = 0,
-        risk = 0,
-        congestion = 0,
-        cnt_alert = 0;
-    
-    for (let i = 0; i < time_data.length; i++) {
-        hour = await ttoh(time_data[i].captured_time);
-        if (cam_id !== time_data[i].camera_id) {
-            // Save compressed data into hourly_data table
-            if (count == 0) {
-                risk = 0;
-                congestion = 0;
-                avg_people = 0;
-                cnt_alert = 0;
-            } else {
-                risk /= count;
-                congestion /= count;
-                avg_people /= count;
-            }
-
-            //data += (cam_id + ", " + cap_date + ", " + cap_time + ", " + risk + ", " + congestion + ", " + avg_people + ", " + max_people + '\n');
-
-            await models.hourly_data.findOrCreate({
-                where: {
-                    camera_id: cam_id,
-                    analyzed_date: cap_date,
-                    analyzed_time: cap_time
-                },
-                defaults: {
-                    risk: risk,
-                    congestion: congestion,
-                    avg_people: avg_people,
-                    max_people: max_people,
-                    alarm_count: cnt_alert
-                }
-            });
-
-            cam_id = time_data[i].camera_id;
-            cap_date = time_data[i].captured_date;
-            cap_time = hour;
-            risk = 0;
-            congestion = 0;
-            avg_people = 0;
-            max_people = 0;
-            cnt_alert = 0;
-            count = 0;
-        }
-
-        risk += time_data[i].risk;
-        congestion += time_data[i].congestion;
-        avg_people += time_data[i].n_people;
-        if (max_people < time_data[i].n_people) {
-            max_people = time_data[i].n_people;
-        }
-        if (time_data[i].alert_checked) {
-            cnt_alert += 1;
-        }
-        count += 1;
+async function createHourlyDataFromMinutelyData() {
+  const max_date = await models.hourly_data.max('analyzed_time')
+  const minutely_data = await models.minutely_data.findAll({
+    raw: true,
+    attributes: ['camera_id', 'analyzed_time', 'n_people', 'risk', 'congestion', 'alert_checked'],
+    order: [
+      ['camera_id', 'ASC'],
+      ['analyzed_time', 'ASC']
+    ],
+    where: {
+      analyzed_time: {
+        [Op.gt]: max_date
+      }
     }
+  });
 
-    if (count == 0) {
-        risk = 0;
-        congestion = 0;
+  let cam_id = minutely_data[0].camera_id,
+    cur_hour = ttoh(minutely_data[0].analyzed_time),
+    avg_people = 0,
+    max_people = 0,
+    count = 0,
+    avg_risk = 0,
+    max_risk = 0,
+    avg_congestion = 0,
+    max_congestion = 0,
+    cnt_alert = 0;
+
+  for (let i = 0; i < minutely_data.length; i++) {
+    if (cam_id !== minutely_data[i].camera_id || cur_hour < ttoh(minutely_data[i].analyzed_time)) {
+      // Save compressed data into hourly_data table
+      if (count == 0) {
+        avg_risk = 0;
+        max_risk = 0;
+        avg_congestion = 0;
+        max_congestion = 0;
         avg_people = 0;
-    } else {
-        risk /= count;
-        congestion /= count;
+        cnt_alert = 0;
+      } else {
+        avg_risk /= count;
+        avg_congestion /= count;
         avg_people /= count;
-    }
+      }
 
-    //data += (cam_id + ", " + cap_date + ", " + cap_time + ", " + risk + ", " + congestion + ", " + avg_people + ", " + max_people + '\n');
-    //console.log([cam_id, cap_date, cap_time, risk, congestion, avg_people, max_people]);
+      //data += (cam_id + ", " + cap_date + ", " + cap_time + ", " + risk + ", " + congestion + ", " + avg_people + ", " + max_people + '\n');
 
-    await models.hourly_data.findOrCreate({
+      await models.hourly_data.findOrCreate({
         where: {
-            camera_id: cam_id,
-            analyzed_date: cap_date,
-            analyzed_time: cap_time
+          camera_id: cam_id,
+          analyzed_time: cur_hour,
         },
         defaults: {
-            risk: risk,
-            congestion: congestion,
-            avg_people: avg_people,
-            max_people: max_people,
-            alarm_count: cnt_alert
+          avg_risk: avg_risk,
+          max_risk: max_risk,
+          avg_congestion: avg_congestion,
+          max_congestion: max_congestion,
+          avg_people: avg_people,
+          max_people: max_people,
+          alarm_count: cnt_alert,
+          data_count: count
         }
-    });
+      });
 
-    //fs.writeFileSync("test.txt", data, "utf8");
+      cam_id = minutely_data[i].camera_id;
+      cur_hour = ttoh(minutely_data[i].analyzed_time)
+      avg_risk = 0;
+      max_risk = 0;
+      avg_congestion = 0;
+      max_congestion = 0;
+      avg_people = 0;
+      max_people = 0;
+      cnt_alert = 0;
+      count = 0;
+    }
 
-    /*
-    await models.time_data.destroy({
-        truncate: true
-    });
-    */
+    avg_risk += minutely_data[i].risk;
+    if (max_risk < minutely_data[i].risk) {
+      max_risk = minutely_data[i].risk;
+    }
 
+    avg_congestion += minutely_data[i].congestion;
+    if (max_congestion < minutely_data[i].congestion) {
+      max_congestion = minutely_data[i].congestion;
+    }
 
+    avg_people += minutely_data[i].n_people;
+    if (max_people < minutely_data[i].n_people) {
+      max_people = minutely_data[i].n_people;
+    }
+
+    if (minutely_data[i].alert_checked) {
+      cnt_alert += 1;
+    }
+    count += 1;
+  }
+
+  if (count == 0) {
+    avg_risk = 0;
+    max_risk = 0;
+    avg_congestion = 0;
+    max_congestion = 0;
+    avg_people = 0;
+    cnt_alert = 0;
+  } else {
+    avg_risk /= count;
+    avg_congestion /= count;
+    avg_people /= count;
+  }
+
+  //data += (cam_id + ", " + cap_date + ", " + cap_time + ", " + risk + ", " + congestion + ", " + avg_people + ", " + max_people + '\n');
+  //console.log([cam_id, cap_date, cap_time, risk, congestion, avg_people, max_people]);
+
+  await models.hourly_data.findOrCreate({
+    where: {
+      camera_id: cam_id,
+      analyzed_time: cur_hour,
+    },
+    defaults: {
+      avg_risk: avg_risk,
+      max_risk: max_risk,
+      avg_congestion: avg_congestion,
+      max_congestion: max_congestion,
+      avg_people: avg_people,
+      max_people: max_people,
+      alarm_count: cnt_alert,
+      data_count: count
+    }
+  });
+
+  //fs.writeFileSync("test.txt", data, "utf8");
+
+  /* delete all minutely data
+  await models.minutely_data.destroy({
+    truncate: true
+  });
+  */
 }
 
-createHourlyDataFromTimeData();
+createHourlyDataFromMinutelyData();

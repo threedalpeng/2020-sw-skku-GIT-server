@@ -1,4 +1,5 @@
 <template>
+<!-- this file manages setting page which contains adjusting congestion figure and alarm function -->
 <div>
   <v-container id="container" fluid>
     <v-row

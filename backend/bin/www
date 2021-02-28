@@ -7,14 +7,14 @@
 var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
+require('dotenv').config()
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '53344');
+var port = normalizePort(process.env.PORT || '80');
 app.set('port', port);
-
 
 /**
  * Create HTTP server.
@@ -90,4 +90,8 @@ function onListening() {
     'pipe ' + addr :
     'port ' + addr.port;
   debug('Listening on ' + bind);
+}
+
+function onClose() {
+  
 }

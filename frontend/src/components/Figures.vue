@@ -170,33 +170,15 @@ import axios from 'axios'
         cluster_fontsize: '15px', // 클러스터 v-card 폰트 사이즈
         proper_n: '',
         social_dist_hold: '',
+
+        place_id: '', // 적정 인원수를 가져올 장소 넘버
       };
     },
     created(){
       this.get_settings(1);
+      this.place_id = 1;
     },
     methods: {
-      red_sign(){
-      // this.isred = true
-      // // console.log("red sign")
-      // this.bgcolor = 'rgb(255, 223, 212)'
-      // setTimeout(()=>{
-      //   this.bgcolor = 'rgb(255,255,255)'
-      // },1000)
-      // setTimeout(()=>{
-      //   this.bgcolor = 'rgb(255, 223, 212)'
-      // },2000)
-      // setTimeout(()=>{
-      //   this.bgcolor = 'rgb(255,255,255)'
-      // },3000)
-      // setTimeout(()=>{
-      //   this.bgcolor = 'rgb(255, 223, 212)'
-      // },4000)
-      // setTimeout(()=>{
-      //   this.bgcolor = 'rgb(255,255,255)'
-      //   this.isred = false
-      // },5000)
-      },
       get_settings(val){
       axios.get('http://115.145.212.100:53344/api/settings/camera/'+val)
         .then(res => {
@@ -225,8 +207,9 @@ import axios from 'axios'
         else
           {this.RiskColor= 'rgba(255, 0, 0, 0.8)';
           this.risk_value= "심각";
-          if(this.isred == false)
-            this.red_sign()}
+          // if(this.isred == false)
+            // this.red_sign()
+            }
 
         if(new_val.congestion == 0)
           {this.CongestionColor= 'gray'
@@ -246,15 +229,33 @@ import axios from 'axios'
         else
           {this.CongestionColor= 'rgba(255, 0, 0, 0.8)';
           this.congestion_value= "심각";
-          if(this.isred == false)
-            this.red_sign()}
+          // if(this.isred == false)
+            // this.red_sign()
+            }
         
-        if(new_val.place_num == 1)
-          this.get_settings(1)
-        else if (new_val.place_num == 2)
-          this.get_settings(2)
-        else if (new_val.place_num == 3)
-          this.get_settings(3)
+
+        //         if(new_val.place_num == 1)
+        //   this.get_settings(1)
+        // else if (new_val.place_num == 2)
+        //   this.get_settings(2)
+        // else if (new_val.place_num == 3)
+        //   this.get_settings(3)
+
+        if(new_val.place_num != this.place_id){
+          if(new_val.place_num == 1){
+            this.get_settings(1)
+            this.place_id = 1
+          }
+          else if(new_val.place_num == 2){
+            this.get_settings(2)
+            this.place_id = 2
+          }
+          else if(new_val.place_num == 3){
+            this.get_settings(3)
+            this.place_id = 3
+          }
+        }
+
       },
     },
   }

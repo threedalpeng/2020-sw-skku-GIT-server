@@ -26,6 +26,21 @@
     <v-main>
       <router-view/>
     </v-main>
+    <v-footer
+      color="primary lighten-1"
+      padless
+    >
+      <v-row>
+        <v-col
+          class="primary lighten-2 py-4 text-center white--text"
+          cols="12"
+        >
+          <!-- {{ new Date().getFullYear() }} — <strong>Vuetify</strong> -->
+          <strong>PreVentra 대표자 유건욱 | 주소 : 경기도 수원시 장안구 서부로2126번길 109, 320호(성균관대학교 기숙사) 
+            | 사업자 등록 번호 : 541-22-01439<br>email-contact : yms010820@g.skku.edu</strong>
+        </v-col>
+      </v-row>
+    </v-footer>
   </v-app>
 </template>
 

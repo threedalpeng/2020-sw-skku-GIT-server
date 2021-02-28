@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {
-    getCameraSettings,
-    saveCameraSettings
+  getCameraSettings,
+  saveCameraSettings
 } = require('./settings');
 
 router.get('/camera/:id', getCameraSettings);

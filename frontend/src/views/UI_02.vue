@@ -3,12 +3,14 @@
     <div class="title">
       <v-row align="center">
         <div class="button">
+          <!-- UI01 button -->
           <v-btn
             v-on:click="link_to_live"
             id="b2" color="primary" dark>Live
             <v-icon color="white" dark right>mdi-video</v-icon>
           </v-btn>
         </div>
+        <!-- select groups to watch -->
         <v-col cols="12" md="4">
           <v-select 
             v-model="groups_selected"
@@ -23,6 +25,7 @@
     </div> 
     <hr align=center>
     <v-container fluid pa-2>
+      <!-- Left Part: Daily chart -->
       <v-row>
         <v-col
           cols="12"
@@ -43,8 +46,10 @@
             <span class="h2" id="highlight">적정 인원 :  </span>
             <span class="h2" id="highlight">{{proper_n_people}}</span>
 
+            <!-- Safety Score -->
             <v-layout wrap row>
               <v-flex xs12 sm6 md6 class="pb-2">
+                <!-- When safety Score is high: color is green -->
                 <v-card
                   v-if="safety" 
                   class ='margin'
@@ -65,6 +70,7 @@
                     </v-layout>
                   </v-container>
                 </v-card>
+                <!-- When Safety Score is low: color is red -->
                 <v-card
                   v-else
                   height="100" 
@@ -102,9 +108,11 @@
                   </v-container>
                 </v-card>
               </v-flex>
+              <!-- Daily Chart -->
               <v-flex>
               <daily-chart :chart-data="dailyDatacollection" width="350" height="300"></daily-chart>
               </v-flex>
+              <!-- Plus Information -->
               <v-flex xs12 sm6 md6>
                   <v-card >
                     <v-container pa-1>
@@ -136,12 +144,13 @@
             </v-layout>
           </v-card>
         </v-col>
+        <!-- Right Part: Period Chart -->
         <v-col cols="12" md="9">
           <v-card
             class="pa-3"
             outlined
             tile
-          ><!--*********date picker for selecting a period*********-->
+          ><!-- date picker for selecting a period -->
             <v-row>
               <v-col
                 cols="12"
@@ -174,6 +183,7 @@
                   </v-date-picker>
                 </v-menu>
               </v-col>
+              <!-- Select Time Unit -->
               <v-col
                 cols="12"
                 sm="6"
@@ -186,6 +196,7 @@
                   dense
                 ></v-select>
               </v-col>
+              <!-- Update dates & time unit -->
               <v-col
                 cols="12"
                 sm="3"
@@ -200,10 +211,15 @@
               </v-col>
             </v-row>
 
+            <!-- Congestion Chart -->
             <h2 id="chart">혼잡도</h2>
             <congestion-chart :chart-data="congestionDatacollection" height="300"/>
+            
+            <!-- Risk Chart -->
             <h2 id="chart">위험도</h2>
             <risk-chart :chart-data="riskDatacollection" height="300"/>
+            
+            <!-- Information Table -->
             <v-data-table 
               dense 
               :headers="headers" 
@@ -233,9 +249,7 @@
   import DailyChart from '@/components/DailyChart'
   import CongestionChart from '@/components/CongestionChart'
   import RiskChart from '@/components/RiskChart'
-  //import statics from '@/components/Figures_UI_02'
   import axios from 'axios'
-  // import moment from 'moment'
   import moment from 'moment'
   import vueMoment from 'vue-moment'
 
@@ -246,7 +260,6 @@
       DailyChart,
       CongestionChart,
       RiskChart,
-      //statics,
     },
     data() {
       return {
@@ -333,7 +346,7 @@
         pointBorderColors_risk_3: [],
         pointBackgroundColors_risk_3: [],
              
-        // Figures
+        // Figures for information table
         location: [],
         appropriate_people: [],
         max_congestion: [],
@@ -354,7 +367,6 @@
           { text: '평균 혼잡도 (%)', value: 'avg_congestion' },
           { text: '최대 위험도 (%)', value: 'max_risk' },
           { text: '평균 위험도 (%)', value: 'avg_risk' },
-          //{ text: '심각단계 평균 지속 시간 (분)', value: 'high_risk' },
           { text: '경고 발생 횟수 (회)', value: 'alert' },
         ],
         places: [],
@@ -364,6 +376,7 @@
       }
     },
     computed: {
+      // check dates
       dateRangeText () {
         if(this.dates[0] > this.dates[1])
           [this.dates[0], this.dates[1]] = [this.dates[1], this.dates[0]] 
@@ -371,13 +384,16 @@
       },
     },
     created() {
+      // first create page
       this.getCreateData()
     },
     watch: {
+      // when counter value changes, get new data
       counter (val) {
         console.log("counter: " + this.counter);
         this.getData();
       },
+      // when group changes, update all page
       groups_selected (val) {
         console.log('groups_selceted: '+this.groups_selected)
         this.groups_num.length=0
@@ -397,6 +413,7 @@
 
         this.fillPlaces();
       },
+      // when space changes, update daily part
       space_selected (val) {
         this.space_num = this.groups.indexOf(this.space_selected)
         this.proper_n_people = this.result[this.space_num].proper_n_people
@@ -412,7 +429,6 @@
           return 'black'
         else if (val >= hold)
           return 'red'
-
       },
       link_to_live(){
       this.$router.push("/video");
@@ -508,7 +524,7 @@
         this.max_people = this.result[this.space_num].today.max_people
         this.avg_people = this.result[this.space_num].today.avg_people
       },
-      updateLabel() { // C&R Chart Label
+      updateLabel() { // Congestion & Risk Chart Label
         var diff=this.firstDate
         this.congestionLabel.length = 0
         this.riskLabel.length = 0
@@ -657,7 +673,7 @@
           }
         }     
       },
-      updateData() { // C&R Chart Data 
+      updateData() { // Congestion & Risk Chart Data 
         this.congestionData_1.length = 0
         this.congestionData_2.length = 0
         this.congestionData_3.length = 0
@@ -770,29 +786,21 @@
           beforeDraw: function(chartInstance, easing) {
             var lineOpts = chartInstance.options.drawHorizontalLine;
             if (lineOpts) {
-
+              // Decide graph X, Y axis, fonts, and draw line on the graph
               var yAxis = chartInstance.scales["y-axis-0"];
               var yValueStart = yAxis.getPixelForValue(lineOpts.lineY[0], 0, 0, true);
               var yValueEnd = yAxis.getPixelForValue(lineOpts.lineY[1], 0, 0, true);
 
               var xAxis = chartInstance.scales["x-axis-0"];
               var xValueStart = xAxis.getPixelForTick(0) - 5;
-              //var xValueEnd = xAxis.getPixelForTick(xAxis.ticks.length-1) + 15/*xAxis.right*/;
               var xValueEnd = xAxis.right;
-
-              // console.log('xValueEnd', xValueEnd);
-              // console.log('xAxis.ticks.length', xAxis.ticks.length);
-              // console.log(xAxis.getPixelForTick(xAxis.ticks.length - 1));
 
               var ctx = chartInstance.chart.ctx;
               ctx.save();
 
-              // le texte
               ctx.font = lineOpts.textFont;
               ctx.fillStyle = lineOpts.textColor;
               ctx.fillText(lineOpts.text, lineOpts.textPosition, yValueStart + 8);
-
-              // la ligne en pointillés
 
               ctx.setLineDash([15, 15]);
               ctx.strokeStyle = lineOpts.lineColor;
@@ -827,7 +835,7 @@
         this.pointBorderColors_risk_3.length = 0;
         this.pointRadius_risk_3.length = 0;
 
-        if(this.groups_selected.length == 1) {
+        if(this.groups_selected.length == 1) { // show graph of the only selected group
           this.congestionDatacollection = {
             // Data for the y-axis of the chart
             labels: this.congestionLabel,
@@ -859,7 +867,6 @@
                 pointRadius: this.pointRadius_risk_1,
                 pointBorderColor: this.pointBorderColors_risk_1,
                 pointBackgroundColor: this.pointBackgroundColors_risk_1,
-                // pointStyle: 'triangle'
               }
             ],
           }
@@ -886,7 +893,7 @@
             }          
           } 
         }
-        else if(this.groups_selected.length == 2) {
+        else if(this.groups_selected.length == 2) { // show graph of the last place of selected group
           this.congestionDatacollection = {
             // Data for the y-axis of the chart
             labels: this.congestionLabel,
@@ -929,7 +936,6 @@
                 pointRadius: this.pointRadius_risk_1,
                 pointBorderColor: this.pointBorderColors_risk_1,
                 pointBackgroundColor: this.pointBackgroundColors_risk_1,
-                // pointStyle: 'triangle'
               },
               {
                 label: this.groups_selected[1],
@@ -941,7 +947,6 @@
                 pointRadius: this.pointRadius_risk_2,
                 pointBorderColor: this.pointBorderColors_risk_2,
                 pointBackgroundColor: this.pointBackgroundColors_risk_2,
-                // pointStyle: 'triangle'
               },
             ],
           } 
@@ -1130,11 +1135,11 @@
           } 
         }
       },
-      fillPlaces(){
+      fillPlaces(){ // Information Table
         console.log("fillPlaces_groups_selected: " + this.groups_selected)
         console.log("fillPlaces_groups_num: " + this.groups_num)
         this.places.length = 0
-        // problem
+        // Make three table
         var place0  = {
           location: '0',
           appropriate_people: 0,
@@ -1197,7 +1202,7 @@
         // console.log("fillPlaces[0]: "+this.places[0].location)
         // console.log("fillPlaces[1]: "+this.places[1].location)
       },
-      getData() {
+      getData() { // get data from backend
         this.firstDate = moment(this.dates[0], 'YYYY-MM-DD')
         this.lastDate = moment(this.dates[1], 'YYYY-MM-DD')
         this.days = this.lastDate.diff(this.firstDate, 'days')
@@ -1258,11 +1263,9 @@
   margin-bottom: 5px;
 }
 .title{
-  /* 단정 심플 직관 */
   border-bottom-style:none;
   border-color: lightgray;
   border-width: medium;
-  /* padding-bottom: 12px; */
   padding-top: 5px;
   margin: 0px;
 }
@@ -1287,7 +1290,7 @@
   font-weight: bold;
   font-family: 'Noto Sans KR', sans-serif;
 }
-#ten{
+#ten{ /* safety score /10 */
   text-align: center;
   font-size: 0.8em;
   font-family: 'Noto Sans KR', sans-serif;
@@ -1306,7 +1309,7 @@
 #chart{
   font-family: 'Noto Sans KR', sans-serif;
 }
-hr{
+hr{ /* line between top and bottom */
   color: lightgray;
   width: 99%;
   margin-left: 10px;
@@ -1319,10 +1322,4 @@ hr{
 #select{
   padding-top: 10px;
 }
-/*
-.chartAreaWrapper {
-       width: 80%;
-       overflow-x: scroll;
-}
-*/
 </style>

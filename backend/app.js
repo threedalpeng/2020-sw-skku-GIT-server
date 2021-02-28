@@ -2,16 +2,29 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const logger = require('morgan');
+const passport = require('passport');
+const session = require('express-session');
+const redis = require('redis');
+const connectRedis = require('connect-redis');
+const history = require('connect-history-api-fallback');
+
 const models = require('./models/index');
+const config = require('./config/config');
+const configurePassport = require('./lib/passport/passport');
+const {
+  killProcessesOnInit
+} = require('./lib/shell/utils');
 
 let app = express();
 let {
   io
-} = require('./scripts/socket');
+} = require('./lib/socket/socket');
 app.io = io;
 
+/**
+ * Sequelize ORM (DB 연결) 관련 코드
+ */
 models.sequelize.sync({
   alter: true
 }).then(() => {
@@ -21,28 +34,54 @@ models.sequelize.sync({
   console.log(err);
 });
 
-let realtimeRouter = require('./routes/realtime/index');
-let statsRouter = require('./routes/stats/index');
-let settingsRouter = require('./routes/settings/index');
-
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// Express 미들웨어
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({
-  extended: false
-}));
-app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/realtime', realtimeRouter);
-app.use('/api/stats', statsRouter);
-app.use('/api/settings', settingsRouter);
+/** Session Store */
+let RedisStore = connectRedis(session);
+let redisClient = redis.createClient();
+redisClient.on('error', (err) => {
+  console.log('Redis error: ', err);
+});
+app.use(session({
+  secret: config.secretKey,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    maxAge: 1000 * 60 * 60 * 1 // ms * s * m * h * d
+  },
+  store: new RedisStore({
+    client: redisClient,
+    host: 'localhost',
+    port: 6379
+  })
+}));
+
+/** Passport */
+configurePassport();
+app.use(passport.initialize());
+app.use(passport.session());
+
+killProcessesOnInit();
+
+/** REST API Routing */
+app.use('/api/realtime', require('./routes/realtime/index'));
+app.use('/api/stats', require('./routes/stats/index'));
+app.use('/api/settings', require('./routes/settings/index'));
+app.use('/api/auth', require('./routes/auth/index'));
+app.use('/api/user', require('./routes/user/index'));
+app.use(history());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  getStatsByDate
-} = require('./stats');
+  getListOfCamera
+} = require('./user');
 
-router.get('/:start_date/:end_date/:unit', getStatsByDate);
+router.get('/cameras', getListOfCamera);
 
 module.exports = router;
