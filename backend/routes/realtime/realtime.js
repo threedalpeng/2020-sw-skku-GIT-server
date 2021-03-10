@@ -89,6 +89,6 @@ module.exports = {
   processStream,
   initCameras,
   killAllProcesses,
-  checkVideoProcessesById,
+  //checkVideoProcessesById,
   runProcess
 };

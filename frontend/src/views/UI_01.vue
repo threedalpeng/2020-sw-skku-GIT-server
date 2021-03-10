@@ -55,9 +55,9 @@
       color="primary"
       dark
       >Analysis
-      <v-icon color="white" dark right>{{
-        icons.mdiArrowRightBoldOutline
-      }}</v-icon>
+      <v-icon color="white" dark right>
+        {{ icons.mdiArrowRightBoldOutline }}
+      </v-icon>
     </v-btn>
   </div>
 </template>
@@ -84,14 +84,15 @@ export default {
       bgcolor: "",
 
       isCCTV: true,
-      getframe: false,
+      isgetframe: false,
       isloading: true,
 
       frame: "",
       n_person: "",
       n_mask_off: "",
       n_mask_on: "",
-      socket: io.connect("http://115.145.212.100:53344"), //{ rememberTransport: false,}), //transport: ['Websocket', 'Flash Socket', 'Ajax long-polling']}),
+      socket: io.connect("http://115.145.212.100:51122"), //{ rememberTransport: false,}), //transport: ['Websocket', 'Flash Socket', 'Ajax long-polling']}),
+      // socket: io.connect("http://115.145.212.100:53344"), //{ rememberTransport: false,}), //transport: ['Websocket', 'Flash Socket', 'Ajax long-polling']}),
       n_mask_unknown: "",
       n_cluster: "",
       risk: "",
@@ -133,11 +134,12 @@ export default {
     });
 
     this.socket.on("alert", (alert_state) => {
-      console.log(alert_state);
+      console.log("socket Alert state : ", alert_state);
       this.alert = alert_state;
     });
 
-    axios.get("http://115.145.212.100:53344/api/realtime/init");
+    // axios.get("http://115.145.212.100:53344/api/realtime/init");
+    axios.get("http://115.145.212.100:51122/api/realtime/init");
     this.socket.emit("join_room", 1);
     // this.red_sign();
   },
@@ -157,7 +159,8 @@ export default {
     },
     handler() {
       //when browser or tab is killed
-      axios.get("http://115.145.212.100:53344/api/realtime/kill");
+      // axios.get("http://115.145.212.100:53344/api/realtime/kill");
+      axios.get("http://115.145.212.100:51122/api/realtime/kill");
     },
   },
   watch: {
@@ -171,16 +174,16 @@ export default {
         mask_audio.play();
       } // backend not finished??
     },
-    risk: function (val) {
-      if (val > 80 && this.isred == false) {
-        // when risk val is over 80 UI background color blinks!
-        // this.red_sign();
-      }
-    },
+    // risk: function (val) {
+    //   if (val > 80 && this.isred == false) {
+    //     // when risk val is over 80 UI background color blinks!
+    //     // this.red_sign();
+    //   }
+    // },
     frame: function (val) {
       //if no recieved frame
       if (val != "") {
-        this.getframe = true;
+        this.isgetframe = true;
         this.isloading = false;
       }
     },

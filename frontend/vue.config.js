@@ -3,12 +3,12 @@ const CompressionPlugin = require('compression-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
     .BundleAnalyzerPlugin;
 module.exports = {
-    configureWebpack: {
-        plugins : [new BundleAnalyzerPlugin({
-            analyzerPort: 1991,
-        })]
+    // configureWebpack: {
+    //     plugins : [new BundleAnalyzerPlugin({
+    //         analyzerPort: 199112,
+    //     })]
 
-    },
+    // },
     devServer: {
         proxy: {
             '/api': {
@@ -27,6 +27,6 @@ module.exports = {
         
         // and this line 
         config.plugin('CompressionPlugin').use(CompressionPlugin);
-      }
+    }
 
 };  

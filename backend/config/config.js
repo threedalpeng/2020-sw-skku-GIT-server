@@ -38,7 +38,7 @@ module.exports = {
   path: {
     shell: "/home/seungho/darknet/server/backend/lib/shell/",
     python: "/home/seungho/darknet/2020-sw-skku-GIT/",
-    video: "/home/seungho/darknet/2020-sw-skku-GIT/video/"
+    video: "/home/seungho/darknet/2020-sw-skku-GIT/video-gumin/"
   },
   secretKey: "secre1tke2yfor3sec5ret5pa2ssword"
 }

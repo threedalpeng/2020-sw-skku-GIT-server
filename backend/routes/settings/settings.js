@@ -15,7 +15,7 @@ async function getCameraSettings(req, res) {
   });
 
   if (current_settings.mode == "video") {
-    current_settings.access_path = (current_settings.access_path).replace("/home/seungho/darknet/2020-sw-skku-GIT/video/", "");
+    current_settings.access_path = (current_settings.access_path).replace("/home/seungho/darknet/2020-sw-skku-GIT/video-gumin/", "");
   }
 
   res.send(current_settings);

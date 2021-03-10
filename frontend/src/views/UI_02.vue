@@ -22,7 +22,7 @@
           ></v-select>
         </v-col>
       </v-row>
-    </div> 
+    </div>
     <hr align=center>
     <v-container fluid pa-2>
       <!-- Left Part: Daily chart -->
@@ -73,8 +73,8 @@
                 <!-- When Safety Score is low: color is red -->
                 <v-card
                   v-else
-                  height="100" 
-                  width="200" 
+                  height="100"
+                  width="200"
                   color="#FF9E80"
                 >
                   <v-container pa-1>
@@ -93,7 +93,7 @@
               <v-flex xs12 sm6 md6 class="pb-2">
                 <v-card height="100" width="200">
                   <v-container pa-1>
-                    <v-layout row>                   
+                    <v-layout row>
                       <v-card-title primary-title>
                         <div>
                           <div class="h4" id="center">지난주 대비</div>
@@ -110,7 +110,7 @@
               </v-flex>
               <!-- Daily Chart -->
               <v-flex>
-              <daily-chart :chart-data="dailyDatacollection" width="350" height="300"></daily-chart>
+                <daily-chart :chart-data="dailyDatacollection" width="350" height="300"></daily-chart>
               </v-flex>
               <!-- Plus Information -->
               <v-flex xs12 sm6 md6>
@@ -264,22 +264,22 @@
     data() {
       return {
         center: 'center',
-        result: '',
+        result: '', // res.data
 
         // Location
         groups: ['Lounge', 'Cafe', 'Gym'],        
-        groups_selected: ['Lounge', 'Cafe', 'Gym'],
-        groups_num: [0, 1, 2],
+        groups_selected: ['Lounge', 'Cafe', 'Gym'], // 선택된 장소 배열
+        groups_num: [0, 1, 2], // 선택된 장소의 배열 index
         space: ['Lounge', 'Cafe', 'Gym'],
-        space_selected: 'Lounge',
-        space_num: 0,
+        space_selected: 'Lounge', //this.groups[0] || ''
+        space_num: 0, //
         proper_n_people: '',
 
         // Safety Score
         safetyScore: '',
         cardColor: '',
         prevScore: '',
-        safetyRate: '',
+        safetyRate: '', // (safetyScore - preScore / preScore) * 100 safetyScore가 이전(prevScore)에 비해 얼마나 증감 했는가?
         safetyWord: '',
         safety: false,
         isUp: false,
@@ -397,12 +397,14 @@
       groups_selected (val) {
         console.log('groups_selceted: '+this.groups_selected)
         this.groups_num.length=0
+        this.groups_num = [] // same code above
         for(var i=0; i<this.groups_selected.length; i++) {
           this.groups_num.push(this.groups.indexOf(this.groups_selected[i]))
         }
         console.log('groups_num: '+this.groups_num)
         this.space=this.groups_selected
         
+        // UPDATE EVERYTHING
         this.fillSpace();
 
         this.updateSafetyScore();
@@ -417,14 +419,13 @@
       space_selected (val) {
         this.space_num = this.groups.indexOf(this.space_selected)
         this.proper_n_people = this.result[this.space_num].proper_n_people
-        console.log("space_selected - proper_n_people: "+ this.proper_n_people)
         this.updateSafetyScore()
         this.updateDaily()
       },
     },
     methods: {
       getColor(val){
-        var hold = '60'
+        var hold = '60' // places에 적용 기준은 주의
         if(val < hold)
           return 'black'
         else if (val >= hold)
@@ -485,7 +486,7 @@
           this.isSame = true;
           this.isDown = false;
         }
-        else if(this.safetyRate < 0) {
+        else if(this.safetyRate < 0) { // 내려간 비율을 나타냄
           this.isUp = false;
           this.isSame = false;
           this.isDown = true;
@@ -533,7 +534,7 @@
         console.log('updateLabel this.firstDate: ' + this.firstDate)
 
         if( this.times=='minute' ) {
-          for (var i=0; i<=this.days; i++) { // show 8am 12pm 4pm 6pm 9pm
+          for (var i=0; i<=this.days; i++) { // show 8am 9am 10am 11am ... 10pm
             console.log(i + ' diff date: '+diff.format('YYYY-MM-DD'))
             this.congestionLabel.push(diff.format('YYYY-MM-DD')+' 8am')          
             this.riskLabel.push(diff.format('YYYY-MM-DD')+' 8am')
@@ -629,7 +630,7 @@
           }
         }
         else if ( this.times=='hour' ) {
-          for (var i=0; i<=this.days; i++) { // show 8am 12pm 4pm 6pm 9pm
+          for (var i=0; i<=this.days; i++) { // show 8am 12pm 3pm 6pm 9pm
             console.log(i + ' diff date: '+diff.format('YYYY-MM-DD'))
             this.congestionLabel.push(diff.format('YYYY-MM-DD')+' 8am')          
             this.riskLabel.push(diff.format('YYYY-MM-DD')+' 8am')    
@@ -680,12 +681,12 @@
         this.riskData_1.length = 0
         this.riskData_2.length = 0
         this.riskData_3.length = 0
-
+// Logic Needs Change START //
         if( this.times=='minute' ) {
           for (var i=0; i<this.groups_selected.length; i++){
             if(i==0){
               var j=0;
-              while(j<(this.days+1)*1440){ // 1440 = 24*60, 1380= 23*60
+              while( j < ( this.days + 1 ) * 1440 ){ // 1day = 1440m = 24h * 60m/h, 1380m = 23h * 60m/h
                 j += 480;
                 for(var k=48; k<138; k++) {
                   this.congestionData_1.push(this.result[0].selected_period.congestions[j]) // 값 넣기
@@ -718,11 +719,12 @@
             }
           }
         }
+// Logic Needs Change END//
         else if ( this.times=='hour' ) {
           for (var i=0; i<this.groups_selected.length; i++) {
             if(i==0){
               var j=0;
-              while(j<(this.days+1)*24){
+              while( j < ( this.days + 1 ) * 24 ){
                 j += 8;
                 for(var k=8; k<23; k++) {
                   this.congestionData_1.push(this.result[0].selected_period.congestions[j]) // 값 넣기
@@ -764,7 +766,7 @@
               for(var j=0; j<(this.days+1); j++){
                 this.congestionData_1.push(this.result[0].selected_period.congestions[j]) // 값 넣기
                 this.riskData_1.push(this.result[0].selected_period.risks[j])                
-              }       
+              }
             }
             else if(i==1){
               for(var j=0; j<(this.days+1); j++){
@@ -818,9 +820,11 @@
         this.pointBackgroundColors_con_1.length = 0;
         this.pointBorderColors_con_1.length = 0;
         this.pointRadius_con_1.length = 0;
+
         this.pointBackgroundColors_con_2.length = 0;
         this.pointBorderColors_con_2.length = 0;
         this.pointRadius_con_2.length = 0;
+
         this.pointBackgroundColors_con_3.length = 0;
         this.pointBorderColors_con_3.length = 0;
         this.pointRadius_con_3.length = 0;
@@ -828,9 +832,11 @@
         this.pointBackgroundColors_risk_1.length = 0;
         this.pointBorderColors_risk_1.length = 0;
         this.pointRadius_risk_1.length = 0;
+
         this.pointBackgroundColors_risk_2.length = 0;
         this.pointBorderColors_risk_2.length = 0;
         this.pointRadius_risk_2.length = 0;
+
         this.pointBackgroundColors_risk_3.length = 0;
         this.pointBorderColors_risk_3.length = 0;
         this.pointRadius_risk_3.length = 0;
@@ -1035,7 +1041,7 @@
           this.riskDatacollection = {
             // Data for the y-axis of the chart
             labels: this.riskLabel,
-            datasets: [
+            datasets: [ // 환경 설정
               {
                 label: this.groups_selected[0],
                 borderColor: this.colors[0],
@@ -1073,7 +1079,7 @@
                 // pointStyle: 'triangle'
               }
             ],
-          }
+          }    // 데이터 적용
           for (var i = 0; i < this.congestionDatacollection.datasets[0].data.length; i++) {
             if (this.congestionDatacollection.datasets[0].data[i] > 60) {
               this.pointBackgroundColors_con_1.push("#ea4335");
@@ -1135,7 +1141,7 @@
           } 
         }
       },
-      fillPlaces(){ // Information Table
+      fillPlaces(){ // Information Table API 문서 필
         console.log("fillPlaces_groups_selected: " + this.groups_selected)
         console.log("fillPlaces_groups_num: " + this.groups_num)
         this.places.length = 0

@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       alert_checked: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+      },
+      n_not_keep_dist: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
       }
     }, {
       comment: "Data per minute"
